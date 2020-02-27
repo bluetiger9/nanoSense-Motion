@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configuration xmlns:xs="http://www.w3.org/2001/XMLSchema-instance">
+  <device Dclock="48000000" Dcore="Cortex-M3" DcoreVersion="r2p1" Dendian="Little-endian" Dfamily="RSL10 Series" Dfpu="NO_FPU" Dmpu="NO_MPU" Dname="RSL10" Dvendor="ONSemiconductor:141" Pname="">
+    <url>http://www.keil.com/dd2/onsemiconductor/rsl10</url>
+    <package info="ON Semiconductor RSL10 Device Family Pack" name="RSL10" url="www.onsemi.com" vendor="ONSemiconductor" version="3.1.575"/>
+  </device>
+  <toolchain Tcompiler="GCC" Toutput="exe"/>
+  <components>
+    <component Cclass="Components" Cgroup="Ambient Light Sensor" Csub="NOA1305" Cvendor="ONSemiconductor" Cversion="1.8.0">
+      <package name="BDK" url="www.onsemi.com/b-idk" vendor="ONSemiconductor" version="1.10.0-dev"/>
+      <file category="source" name="source/firmware/Components/noa1305_driver/noa1305.c"/>
+      <file category="header" name="include/components/noa1305.h"/>
+    </component>
+    <component Cclass="Components" Cgroup="Environmental Sensor" Csub="BME680" Cvendor="ONSemiconductor" Cversion="3.5.8">
+      <package name="BDK" url="www.onsemi.com/b-idk" vendor="ONSemiconductor" version="1.10.0-dev"/>
+      <file category="doc" name="docs/BME680_driver/html/index.html"/>
+      <file category="source" name="source/firmware/Components/BME680_driver/bme680.c"/>
+      <file category="header" name="include/components/bme680.h"/>
+      <file category="header" name="include/components/bme680_defs.h"/>
+    </component>
+    <component Cclass="Components" Cgroup="Environmental Sensor" Csub="BSEC" Cvariant="Normal" Cvendor="ONSemiconductor" Cversion="1.4.7-1">
+      <package name="BDK" url="www.onsemi.com/b-idk" vendor="ONSemiconductor" version="1.10.0-dev"/>
+      <file category="doc" name="source/firmware/Components/BSEC_1.4.7.1_Generic_Release_20180907/integration_guide/BST-BME680-Integration-Guide-AN008-47.pdf"/>
+      <file category="header" name="include/components/bsec_datatypes.h"/>
+      <file category="header" name="include/components/bsec_interface.h"/>
+      <file category="library" condition="BDK_COMPONENT_BSEC_LIB" name="source/firmware/Components/BSEC_1.4.7.1_Generic_Release_20180907/algo/bin/Normal_version/gcc/Cortex_M3/libalgobsec.a"/>
+      <file attr="template" category="source" name="source/firmware/Components/BSEC_1.4.7.1_Generic_Release_20180907/examples/bsec_integration.h" select="BSEC IoT integration example"/>
+      <file attr="template" category="source" name="source/firmware/Components/BSEC_1.4.7.1_Generic_Release_20180907/examples/bsec_integration.c" select="BSEC IoT integration example"/>
+      <file attr="template" category="source" name="source/firmware/Components/BSEC_1.4.7.1_Generic_Release_20180907/examples/bsec_iot_example.c" select="BSEC IoT main example with callback prototypes"/>
+    </component>
+    <component Cclass="Components" Cgroup="Motion Sensor" Csub="BHI160 Firmware" Cvariant="di03 BMI160 BMM150" Cvendor="ONSemiconductor" Cversion="1.0.4">
+      <package name="BDK" url="www.onsemi.com/b-idk" vendor="ONSemiconductor" version="1.10.0-dev"/>
+      <file category="doc" name="docs/html/_c_m_s_i_s__c_o_m_p_o_n_e_n_t_s.html#CC_BHI160_FIRMWARE"/>
+      <file category="source" name="source/firmware/Components/BHy1_driver_and_MCU_solution/examples/firmware/bhy1_firmware.c"/>
+      <file category="header" name="include/components/bhy1_firmware/bhy1_firmware.h"/>
+      <file category="header" name="include/components/bhy1_firmware/Bosch_PCB_7183_di03_BMI160_BMM150-7183_di03.2.1.11696_170103.h"/>
+    </component>
+    <component Cclass="Components" Cgroup="Motion Sensor" Csub="BHy1 Driver" Cvendor="ONSemiconductor" Cversion="1.0.4">
+      <package name="BDK" url="www.onsemi.com/b-idk" vendor="ONSemiconductor" version="1.10.0-dev"/>
+      <file category="doc" name="source/firmware/Components/BHy1_driver_and_MCU_solution/doc/BHy MCU driver porting guide_v1.8.pdf"/>
+      <file category="doc" name="docs/BHy_driver/html/index.html"/>
+      <file category="source" name="source/firmware/Components/BHy1_driver_and_MCU_solution/driver/src/bhy.c"/>
+      <file category="source" name="source/firmware/Components/BHy1_driver_and_MCU_solution/driver/src/bhy_uc_driver.c"/>
+      <file category="header" name="include/components/bhy.h"/>
+      <file category="header" name="include/components/bhy_uc_driver.h"/>
+      <file category="header" name="include/components/bhy_uc_driver_config.h"/>
+      <file category="header" name="include/components/bhy_uc_driver_constants.h"/>
+      <file category="header" name="include/components/bhy_uc_driver_types.h"/>
+    </component>
+    <component Capiversion="1.0.0" Cclass="Device" Cgroup="Bluetooth Core" Csub="BLE Stack" Cvariant="release" Cvendor="ONSemiconductor" Cversion="3.1.575" deviceDependent="1">
+      <package name="RSL10" url="www.onsemi.com" vendor="ONSemiconductor" version="3.1.575"/>
+      <file category="doc" deviceDependent="1" name="documentation/RSL10_firmware_reference.pdf"/>
+      <file category="library" deviceDependent="1" name="lib/ble_core/Release/libblelib.a"/>
+    </component>
+    <component Capiversion="1.0.0" Cclass="Device" Cgroup="Bluetooth Core" Csub="Kernel" Cvariant="release" Cvendor="ONSemiconductor" Cversion="3.1.575" deviceDependent="1">
+      <package name="RSL10" url="www.onsemi.com" vendor="ONSemiconductor" version="3.1.575"/>
+      <file category="doc" deviceDependent="1" name="documentation/RSL10_firmware_reference.pdf"/>
+      <file category="library" deviceDependent="1" name="lib/ble_core/Release/libkelib.a"/>
+    </component>
+    <component Cclass="Device" Cgroup="Bluetooth Profiles" Csub="BASS" Cvariant="release" Cvendor="ONSemiconductor" Cversion="3.1.575" deviceDependent="1">
+      <package name="RSL10" url="www.onsemi.com" vendor="ONSemiconductor" version="3.1.575"/>
+      <file category="doc" deviceDependent="1" name="documentation/ceva/RW-BLE-PRF-BAS-IS.pdf"/>
+      <file category="header" deviceDependent="1" name="include/ble/profiles/bass.h"/>
+      <file category="library" deviceDependent="1" name="lib/ble_profiles/Release/libbass.a"/>
+    </component>
+    <component Cclass="Device" Cgroup="Libraries" Csub="System" Cvariant="source" Cvendor="ONSemiconductor" Cversion="3.1.575" deviceDependent="1">
+      <package name="RSL10" url="www.onsemi.com" vendor="ONSemiconductor" version="3.1.575"/>
+      <file category="doc" deviceDependent="1" name="documentation/RSL10_firmware_reference.pdf"/>
+      <file category="header" deviceDependent="1" name="include/rsl10_romvect.h"/>
+      <file category="header" deviceDependent="1" name="include/rsl10_sys_adc.h"/>
+      <file category="header" deviceDependent="1" name="include/rsl10_sys_aes.h"/>
+      <file category="header" deviceDependent="1" name="include/rsl10_sys_asrc.h"/>
+      <file category="header" deviceDependent="1" name="include/rsl10_sys_audio.h"/>
+      <file category="header" deviceDependent="1" name="include/rsl10_sys_audiosink.h"/>
+      <file category="header" deviceDependent="1" name="include/rsl10_sys_bbif.h"/>
+      <file category="header" deviceDependent="1" name="include/rsl10_sys_clocks.h"/>
+      <file category="header" deviceDependent="1" name="include/rsl10_sys_cm3.h"/>
+      <file category="header" deviceDependent="1" name="include/rsl10_sys_crc.h"/>
+      <file category="header" deviceDependent="1" name="include/rsl10_sys_dio.h"/>
+      <file category="header" deviceDependent="1" name="include/rsl10_sys_dma.h"/>
+      <file category="header" deviceDependent="1" name="include/rsl10_sys_flash.h"/>
+      <file category="header" deviceDependent="1" name="include/rsl10_sys_gpio.h"/>
+      <file category="header" deviceDependent="1" name="include/rsl10_sys_i2c.h"/>
+      <file category="header" deviceDependent="1" name="include/rsl10_sys_ip.h"/>
+      <file category="header" deviceDependent="1" name="include/rsl10_sys_lpdsp32.h"/>
+      <file category="header" deviceDependent="1" name="include/rsl10_sys_pcm.h"/>
+      <file category="header" deviceDependent="1" name="include/rsl10_sys_power.h"/>
+      <file category="header" deviceDependent="1" name="include/rsl10_sys_power_modes.h"/>
+      <file category="header" deviceDependent="1" name="include/rsl10_sys_pwm.h"/>
+      <file category="header" deviceDependent="1" name="include/rsl10_sys_rffe.h"/>
+      <file category="header" deviceDependent="1" name="include/rsl10_sys_rtc.h"/>
+      <file category="header" deviceDependent="1" name="include/rsl10_sys_spi.h"/>
+      <file category="header" deviceDependent="1" name="include/rsl10_sys_timers.h"/>
+      <file category="header" deviceDependent="1" name="include/rsl10_sys_uart.h"/>
+      <file category="header" deviceDependent="1" name="include/rsl10_sys_watchdog.h"/>
+      <file category="header" deviceDependent="1" name="include/rsl10_protocol.h"/>
+      <file category="source" deviceDependent="1" name="source/firmware/syslib/code/rsl10_romvect.c"/>
+      <file category="source" deviceDependent="1" name="source/firmware/syslib/code/rsl10_sys_asrc.c"/>
+      <file category="source" deviceDependent="1" name="source/firmware/syslib/code/rsl10_sys_audio.c"/>
+      <file category="source" deviceDependent="1" name="source/firmware/syslib/code/rsl10_sys_clocks.c"/>
+      <file category="source" deviceDependent="1" name="source/firmware/syslib/code/rsl10_sys_crc.c"/>
+      <file category="source" deviceDependent="1" name="source/firmware/syslib/code/rsl10_sys_dma.c"/>
+      <file category="source" deviceDependent="1" name="source/firmware/syslib/code/rsl10_sys_flash.c"/>
+      <file category="source" deviceDependent="1" name="source/firmware/syslib/code/rsl10_sys_power.c"/>
+      <file category="source" deviceDependent="1" name="source/firmware/syslib/code/rsl10_sys_power_modes.c"/>
+      <file category="source" deviceDependent="1" name="source/firmware/syslib/code/rsl10_sys_rffe.c"/>
+      <file category="source" deviceDependent="1" name="source/firmware/syslib/code/rsl10_sys_timers.c"/>
+      <file category="source" deviceDependent="1" name="source/firmware/syslib/code/rsl10_sys_uart.c"/>
+      <file category="source" deviceDependent="1" name="source/firmware/syslib/code/rsl10_sys_version.c"/>
+      <file attr="config" category="source" deviceDependent="1" name="source/firmware/syslib/code/rsl10_protocol.c" version="3.1.575"/>
+    </component>
+    <component Cclass="Device" Cgroup="Startup" Cvariant="source" Cvendor="ONSemiconductor" Cversion="3.1.575" deviceDependent="1">
+      <package name="RSL10" url="www.onsemi.com" vendor="ONSemiconductor" version="3.1.575"/>
+      <file category="doc" deviceDependent="1" name="documentation/RSL10_firmware_reference.pdf"/>
+      <file category="include" deviceDependent="1" name="include/"/>
+      <file category="source" condition="GCC_Condition" deviceDependent="1" name="source/firmware/cmsis/source/sbrk.c"/>
+      <file category="source" condition="GCC_Condition" deviceDependent="1" name="source/firmware/cmsis/source/start.c"/>
+      <file attr="config" category="source" deviceDependent="1" name="source/firmware/cmsis/source/system_rsl10.c" version="1.0.0"/>
+      <file attr="config" category="source" condition="GCC_Condition" deviceDependent="1" name="source/firmware/cmsis/source/GCC/startup_rsl10.S" version="1.0.0"/>
+      <file attr="config" category="linkerScript" condition="GCC_Condition" deviceDependent="1" name="source/firmware/cmsis/source/GCC/sections.ld" version="1.0.0"/>
+      <file attr="config" category="header" deviceDependent="1" name="source/firmware/drivers/RTE_config/RTE_Device.h" version="1.0.0"/>
+    </component>
+  </components>
+  <apis>
+    <api Capiversion="1.0.0" Cclass="Device" Cgroup="Bluetooth Core" Cvendor="ONSemiconductor" Cversion="1.0.0" exclusive="0">
+      <package name="RSL10" url="www.onsemi.com" vendor="ONSemiconductor" version="3.1.575"/>
+      <file category="doc" name="documentation/RSL10_firmware_reference.pdf"/>
+      <file category="include" name="include/kernel/"/>
+      <file category="include" name="include/ble/"/>
+      <file category="include" name="include/bb/"/>
+      <file category="include" name="include/ble/profiles/"/>
+      <file category="source" condition="Not_IAR_Condition" name="source/firmware/ble_abstraction_layer/ble/source/stubprf.c"/>
+    </api>
+  </apis>
+  <packages useAllLatestPacks="1"/>
+</configuration>
