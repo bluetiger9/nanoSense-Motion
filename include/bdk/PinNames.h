@@ -54,8 +54,8 @@ typedef enum {
     PIN_DIO15,
 
     /* I2C Peripheral pins */
-    PIN_I2C_SCK = PIN_DIO5, /**< I2C Clock signal */
-    PIN_I2C_SDA = PIN_DIO4, /**< I2C Data signal*/
+    PIN_I2C_SCK = PIN_DIO0, /**< I2C Clock signal */
+    PIN_I2C_SDA = PIN_DIO1, /**< I2C Data signal*/
 
     /* SPI Peripheral pins */
     PIN_SPI_SCK = NC, /**< NOT CONNECTED - SPI Clock signal */
@@ -64,25 +64,25 @@ typedef enum {
     PIN_SPI_CS = NC, /**< NOT CONNECTED - SPI CS signal. */
 
     /* UART Peripheral pins */
-    PIN_UART_TX = PIN_DIO3, /**< NOT CONNECTED - UART TX signal */
-    PIN_UART_RX = PIN_DIO7, /**< NOT CONNECTED - UART RX signal */
+    PIN_UART_TX = NC, /**< NOT CONNECTED - UART TX signal */
+    PIN_UART_RX = NC, /**< NOT CONNECTED - UART RX signal */
 
     /* Board specific pins */
-    PIN_RECOVERY = PIN_DIO12, /**< Pin used for deep sleep recovery in HAL. */
-    PIN_BUTTON0 = PIN_DIO15, /**< On-board user button PB1 (PCB edge). */
-	PIN_BUTTON1 = PIN_DIO12, /**< On-board user button PB2 (Board center). */
+    PIN_RECOVERY = NC, /**< Pin used for deep sleep recovery in HAL. */
+    PIN_BUTTON0 = NC, /**< On-board user button PB1 (PCB edge). */
+	PIN_BUTTON1 = NC, /**< On-board user button PB2 (Board center). */
 
-    PIN_LED_RED = PIN_DIO2,
-	PIN_LED_GREEN = PIN_DIO1,
-	PIN_LED_BLUE = PIN_DIO0,
+    PIN_LED_RED = PIN_DIO5,
+	PIN_LED_GREEN = PIN_DIO8, /* Analog power enable */
+	PIN_LED_BLUE = NC,
 
-	PIN_GIO_SPARE = PIN_DIO3, /**< GPIO pin for expansion header. */
-	PIN_INT_NOA1305 = PIN_DIO13, /**< IRQ signal from on-board NOA1305 ALS. */
-	PIN_INT_BHI160 = PIN_DIO9, /**< IRQ signal from on-board BHI160 sensor. */
+	PIN_GIO_SPARE = NC, /**< GPIO pin for expansion header. */
+	PIN_INT_NOA1305 = NC, /**< IRQ signal from on-board NOA1305 ALS. */
+	PIN_INT_BHI160 = NC, /**< IRQ signal from on-board BHI160 sensor. */
 
     /* ERRATA: CLK and DIO pins are swapped on mic pads */
-	PIN_MEMS_CLK = PIN_DIO10, /**< Clock for on-board MEMS microphone. */
-	PIN_MEMS_DOUT = PIN_DIO6 /**< Data input from on-board MEMS microphone. */
+	PIN_MEMS_CLK = NC, /**< Clock for on-board MEMS microphone. */
+	PIN_MEMS_DOUT = NC /**< Data input from on-board MEMS microphone. */
 } PinName;
 
 #endif /* PIN_NAMES_H_ */

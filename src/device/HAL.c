@@ -61,14 +61,6 @@ void HAL_Init(enum HAL_ClockConfiguration clk_conf)
     Sys_NVIC_DisableAllInt();
     Sys_NVIC_ClearAllPendingInt();
 
-    /* Test recovery DIO (DIO12) to pause the program to make it easy to
-     * re-flash after power up.
-     */
-    DIO->CFG[PIN_RECOVERY] = DIO_MODE_INPUT | DIO_WEAK_PULL_UP | DIO_LPF_DISABLE
-            | DIO_6X_DRIVE;
-    while (DIO_DATA->ALIAS[PIN_RECOVERY] == 0);
-    DIO->CFG[PIN_RECOVERY] = DIO_MODE_DISABLE | DIO_NO_PULL;
-
     /* Calibrate the board
      * The supplemental calibrated values are loaded by the user-defined
      * initialization function during the system boot process for supplemental mode.*/

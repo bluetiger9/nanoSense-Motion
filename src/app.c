@@ -23,16 +23,13 @@ int main(void)
     Device_Initialize();
 
     /* Indication - Initialization complete. */
-    //uint32_t pin_led = PIN_DIO5;
-    uint32_t pin_led = PIN_DIO6;
-    while (true) {
-    	LED_On(pin_led);
-    	HAL_Delay(250);
-    	LED_Off(pin_led);
-    	HAL_Delay(250);
-    }
 
-    //Main_Loop();
+    LED_On(LED0);
+    HAL_Delay(250);
+    LED_Off(LED0);
+    HAL_Delay(750);
+
+    Main_Loop();
 }
 
 static void App_StateMachine(void)

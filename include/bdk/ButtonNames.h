@@ -26,8 +26,8 @@
 
 /** Button names accepted by Button API when BDK-GEVB board is used. */
 typedef enum {
-    BTN0 = PIN_BUTTON0,
-	BTN1 = PIN_BUTTON1,
+    BTN0 = -101,
+	BTN1 = -102,
 
     /* Aliases */
     BUTTON0 = BTN0, /**< Alias for \ref BTN0 */

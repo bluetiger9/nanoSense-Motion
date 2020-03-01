@@ -97,14 +97,6 @@ void Device_Initialize(void)
     Sys_NVIC_DisableAllInt();
     Sys_NVIC_ClearAllPendingInt();
 
-    /* Test recovery DIO pad to pause the program to make it easy to
-     * re-flash after power up.
-     */
-    DIO->CFG[PIN_RECOVERY] = DIO_MODE_INPUT | DIO_WEAK_PULL_UP | DIO_LPF_DISABLE
-            | DIO_6X_DRIVE;
-    while (DIO_DATA->ALIAS[PIN_RECOVERY] == 0);
-    DIO->CFG[PIN_RECOVERY] = DIO_MODE_DISABLE | DIO_NO_PULL;
-
     ConfigurePowerSupply();
 
     ConfigureSystemClocks();
@@ -167,19 +159,9 @@ void Device_Initialize_WakeUp(void)
     /* Restore DIO pad configuration before disabling pad retention. */
     LED_Initialize(LED0);
     LED_Initialize(LED1);
-    LED_Initialize(LED2);
-
-    BHI160_NDOF_PadRestore();
 
     /* Turn off pad retention */
     ACS_WAKEUP_CTRL->PADS_RETENTION_EN_BYTE = PADS_RETENTION_DISABLE_BYTE;
-
-    /* Halt program if recovery button is pressed to allow debugger to connect.
-     */
-    Sys_DIO_Config(PIN_RECOVERY,
-            DIO_MODE_INPUT | DIO_WEAK_PULL_UP | DIO_LPF_DISABLE);
-    while (DIO_DATA->ALIAS[PIN_RECOVERY] == 0);
-    Sys_DIO_Config(PIN_RECOVERY, DIO_MODE_INPUT | DIO_NO_PULL);
 
     /* Configure clock dividers after wake-up. */
     ConfigureSystemClocks();
@@ -256,8 +238,8 @@ void BLE_Initialize(void)
 void App_Env_Initialize(void)
 {
     /* Initialize all LEDs. */
-    //LED_Initialize(LED_RED);
-    //LED_Initialize(LED_GREEN);
+    LED_Initialize(LED0);
+    LED_Initialize(LED1);
     //LED_Initialize(LED_BLUE);
 
     /* Start application task. */
@@ -274,32 +256,6 @@ void App_Env_Initialize(void)
 
     /* Initialize and put on-board sensors to sleep modes. */
     TRACE_PRINTF("Initializing sensors.\r\n");
-
-    /* Add Low Power ALS node.
-     * NOA1305 ambient light sensor.
-     */
-#if RTE_APP_ICS_AL_ENABLED == 1
-    CS_RegisterNode(CSN_LP_ALS_Create(Timer_GetContext()));
-#else
-    NOA1305_ALS_Initialize();
-#endif
-
-    /* Add Low Power Environmental node.
-     * BME680 environmental sensor + BSEC library
-     */
-#if RTE_APP_ICS_EV_ENABLED == 1
-    CS_RegisterNode(CSN_LP_ENV_Create(Timer_GetContext()));
-#endif
-
-    /* Load RAM patch with BMM150 support into BHI160 and put them to sleep
-     * mode.
-     */
-#if RTE_APP_ICS_AL_ENABLED == 1
-    CS_RegisterNode(CSN_LP_AO_Create());
-#else
-    BHI160_NDOF_Initialize();
-    BHI160_NDOF_SetPowerMode(BHI160_NDOF_PM_STANDBY);
-#endif
 
     TRACE_PRINTF("Initializing sensors done.\r\n");
 }
