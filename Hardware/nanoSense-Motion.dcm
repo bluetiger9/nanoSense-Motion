@@ -1,0 +1,28 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP ADS7142IRUGR
+D 12-bit 140-kSPS 2-ch nanopower SAR ADC with 1.8-V operation in 1.5-mm x 2-mm QFN package
+F http://www.ti.com/general/docs/suppproductinfo.tsp?distId=10&gotoUrl=http%3A%2F%2Fwww.ti.com%2Flit%2Fgpn%2Fads7142
+$ENDCMP
+#
+$CMP BU7265
+D BU7265
+F ~
+$ENDCMP
+#
+$CMP NCH-RSL10-101Q48-ABG
+D RF System on a Chip - SoC Radio SoC Ultr Low Pwr
+F http://www.onsemi.com/pub/Collateral/RSL10-D.PDF
+$ENDCMP
+#
+$CMP PL-N823-01
+D KEMET - PL-N823-01 - PYROELECTRIC INFRARED SENSOR, 2M
+F https://api.kemet.com/component-edge/download/datasheet/PL-N823-01.pdf
+$ENDCMP
+#
+$CMP SIP32431DR3-T1GE3
+D VISHAY - SIP32431DR3-T1GE3 - IC, LOAD SWITCH, 1.1V-5.5V, 1A, SC70
+F https://www.vishay.com/docs/66597/sip32431.pdf
+$ENDCMP
+#
+#End Doc Library
