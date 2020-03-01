@@ -14,6 +14,7 @@
 #include <stdio.h>
 
 #include "app.h"
+#include "ads7142.h"
 
 enum App_StateStruct app_state = APP_STATE_INIT;
 struct stimer app_state_timer;
@@ -22,12 +23,20 @@ int main(void)
 {
     Device_Initialize();
 
-    /* Indication - Initialization complete. */
+    // analog power on
+    LED_On(LED1);
+    HAL_Delay(1000);
 
+    // reset the ADS7142
+    ads7142_reset();
+
+    /* Indication - Initialization complete. */
     LED_On(LED0);
     HAL_Delay(250);
     LED_Off(LED0);
     HAL_Delay(750);
+
+    while (true);
 
     Main_Loop();
 }

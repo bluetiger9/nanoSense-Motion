@@ -41,7 +41,7 @@ static I2C_TRANSFER_INFO I2C0_TransferInfo = { 0U };
 static I2C_PINS I2C0_Pins = {
         PIN_I2C_SCK,
         PIN_I2C_SDA,
-        (DIO_LPF_ENABLE | DIO_6X_DRIVE | DIO_NO_PULL)
+        (DIO_LPF_ENABLE | DIO_6X_DRIVE | /*DIO_NO_PULL*/ DIO_STRONG_PULL_UP)
 };
 
 /* I2C0 Resources */

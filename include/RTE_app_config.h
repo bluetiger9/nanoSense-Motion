@@ -53,7 +53,8 @@
 // <1=> Fast
 // <2=> Fast+
 #ifndef RTE_APP_I2C_BUS_SPEED
-#define RTE_APP_I2C_BUS_SPEED  2
+#define RTE_APP_I2C_BUS_SPEED  0
+//#define RTE_APP_I2C_BUS_SPEED  2
 #endif
 
 // <h> IDK Custom Service

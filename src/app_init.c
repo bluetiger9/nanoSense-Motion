@@ -242,6 +242,9 @@ void App_Env_Initialize(void)
     LED_Initialize(LED1);
     //LED_Initialize(LED_BLUE);
 
+    Sys_DIO_Config(PIN_ADS7142_READY, DIO_MODE_GPIO_IN_0 | DIO_WEAK_PULL_UP );
+    Sys_DIO_Config(PIN_ADS7142_ALERT, DIO_MODE_GPIO_IN_0 | DIO_WEAK_PULL_UP );
+
     /* Start application task. */
     BDK_TaskStart();
 

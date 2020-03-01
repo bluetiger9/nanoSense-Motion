@@ -82,7 +82,10 @@ typedef enum {
 
     /* ERRATA: CLK and DIO pins are swapped on mic pads */
 	PIN_MEMS_CLK = NC, /**< Clock for on-board MEMS microphone. */
-	PIN_MEMS_DOUT = NC /**< Data input from on-board MEMS microphone. */
+	PIN_MEMS_DOUT = NC, /**< Data input from on-board MEMS microphone. */
+
+	PIN_ADS7142_ALERT = PIN_DIO2,
+	PIN_ADS7142_READY = PIN_DIO3,
 } PinName;
 
 #endif /* PIN_NAMES_H_ */
