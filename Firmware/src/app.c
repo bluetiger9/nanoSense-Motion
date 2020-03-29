@@ -19,24 +19,27 @@
 enum App_StateStruct app_state = APP_STATE_INIT;
 struct stimer app_state_timer;
 
+void ledNotif(uint8_t cnt) {
+	ledNotif2(cnt, 250);
+}
+
+void ledNotif2(uint8_t cnt, uint8_t period) {
+	for (int i = 0; i < cnt; ++i) {
+		if (i >= 0) {
+			HAL_Delay(period);
+		}
+		LED_On(LED_RED);
+		HAL_Delay(period);
+		LED_Off(LED_RED);
+	}
+}
+
 int main(void)
 {
     Device_Initialize();
 
-    // analog power on
-    LED_On(LED1);
-    HAL_Delay(1000);
-
-    // reset the ADS7142
-    ads7142_reset();
-
     /* Indication - Initialization complete. */
-    LED_On(LED0);
-    HAL_Delay(250);
-    LED_Off(LED0);
-    HAL_Delay(750);
-
-    while (true);
+    ledNotif(4);
 
     Main_Loop();
 }
@@ -61,9 +64,9 @@ static void App_StateMachine(void)
         BDK_BLE_AdvertisingStart();
 
         // Signal to user.
-        LED_On(LED_GREEN);
+        LED_On(LED_RED);
         HAL_Delay(APP_STATE_IND_LED_INTERVAL_MS);
-        LED_Off(LED_GREEN);
+        LED_Off(LED_RED);
 
         app_state = APP_STATE_ADVERTISING;
         break;
@@ -74,17 +77,10 @@ static void App_StateMachine(void)
         // Check if advertisement stop timeout has elapsed.
         if (stimer_is_expired(&app_state_timer) == true)
         {
-            // Set timeout to periodically check button state while advertising
-            // is disabled.
-            stimer_expire_from_now_ms(&app_state_timer,
-                    RTE_APP_BTN_CHECK_TIMEOUT);
-
             // Stop advertising
+            ledNotif(2);
             BDK_BLE_AdvertisingStop();
-
-            LED_On(LED_BLUE);
-            HAL_Delay(APP_STATE_IND_LED_INTERVAL_MS);
-            LED_Off(LED_BLUE);
+            stimer_stop(&app_state_timer);
 
             // Enter sleep state
             app_state = APP_STATE_SLEEP;
@@ -97,26 +93,6 @@ static void App_StateMachine(void)
         // Schedule next wake up with the same button check interval
         stimer_advance(&app_state_timer);
 
-        BTN_Initialize(BUTTON0);
-
-        // Check button state
-        if (BTN_Read(BUTTON0) == BTN_PRESSED)
-        {
-            // Set timeout to disable advertising if not connection is
-            // established for RTE_APP_ADV_DISABLE_TIMEOUT seconds.
-            stimer_expire_from_now_s(&app_state_timer,
-                    RTE_APP_ADV_DISABLE_TIMEOUT);
-
-            // Start BLE advertising
-            BDK_BLE_AdvertisingStart();
-
-            // Signal wake up event to user.
-            LED_On(LED_GREEN);
-            HAL_Delay(APP_STATE_IND_LED_INTERVAL_MS);
-            LED_Off(LED_GREEN);
-
-            app_state = APP_STATE_ADVERTISING;
-        }
         break;
 
     case APP_STATE_START_CONNECTION:
@@ -166,10 +142,15 @@ void Main_Loop(void)
             /* Attempt to enter deep sleep mode.
              * BLE_Power_Mode_Enter will not return when deep sleep is
              * entered. */
+            ledNotif2(3, 150);
+
             __disable_irq();
+
             sleep_allowed = BLE_Power_Mode_Enter(&sleep_mode_env,
                     POWER_MODE_SLEEP);
+
             __enable_irq();
+            ledNotif2(4, 150);
 
             /* Re-enable basic functionality needed by main loop until device is
              * ready to enter deep sleep. */

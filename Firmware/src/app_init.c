@@ -157,11 +157,11 @@ void Device_Initialize_WakeUp(void)
             | JTCK_LPF_ENABLED;
 
     /* Restore DIO pad configuration before disabling pad retention. */
-    LED_Initialize(LED0);
-    LED_Initialize(LED1);
+    LED_Initialize(LED_RED);
+    LED_Initialize(ANALOG_POWER);
 
     /* Turn off pad retention */
-    ACS_WAKEUP_CTRL->PADS_RETENTION_EN_BYTE = PADS_RETENTION_DISABLE_BYTE;
+    ACS_WAKEUP_CTRL->PADS_RETENTION_EN_BYTE = PADS_RETENTION_ENABLE_BYTE;
 
     /* Configure clock dividers after wake-up. */
     ConfigureSystemClocks();
@@ -199,12 +199,15 @@ void Device_Initialize_WakeUp(void)
     switch (ACS_WAKEUP_STATE->WAKEUP_SRC_BYTE)
     {
     case WAKEUP_DUE_TO_RTC_ALARM_BYTE:
+    	ledNotif(1);
         TRACE_PRINTF("RTC\r\n");
         break;
     case WAKEUP_DUE_TO_BB_TIMER_BYTE:
+    	ledNotif(2);
         TRACE_PRINTF("BB_TIM\r\n");
         break;
     default:
+    	ledNotif(3);
         TRACE_PRINTF("other (0x%x)\r\n", ACS_WAKEUP_STATE->WAKEUP_SRC_BYTE);
         break;
     }
@@ -235,15 +238,26 @@ void BLE_Initialize(void)
      CS_Init();
 }
 
+void analogOff() {
+	LED_Off(ANALOG_POWER);
+    Sys_DIO_Config(PIN_ADS7142_ALERT, DIO_MODE_DISABLE );
+    Sys_DIO_Config(PIN_ADS7142_READY, DIO_MODE_DISABLE );
+}
+
+void analogOn() {
+    Sys_DIO_Config(PIN_ADS7142_READY, DIO_MODE_GPIO_IN_0 | DIO_WEAK_PULL_UP );
+    Sys_DIO_Config(PIN_ADS7142_ALERT, DIO_MODE_GPIO_IN_0 /* | DIO_WEAK_PULL_UP */ );
+	LED_On(ANALOG_POWER);
+}
+
 void App_Env_Initialize(void)
 {
     /* Initialize all LEDs. */
-    LED_Initialize(LED0);
-    LED_Initialize(LED1);
-    //LED_Initialize(LED_BLUE);
+    LED_Initialize(LED_RED);
+    LED_Initialize(ANALOG_POWER);
 
-    Sys_DIO_Config(PIN_ADS7142_READY, DIO_MODE_GPIO_IN_0 | DIO_WEAK_PULL_UP );
-    Sys_DIO_Config(PIN_ADS7142_ALERT, DIO_MODE_GPIO_IN_0 | DIO_WEAK_PULL_UP );
+    Sys_DIO_Config(PIN_ADS7142_ALERT, DIO_MODE_DISABLE );
+    Sys_DIO_Config(PIN_ADS7142_READY, DIO_MODE_DISABLE );
 
     /* Start application task. */
     BDK_TaskStart();
@@ -252,6 +266,7 @@ void App_Env_Initialize(void)
      * Speed setting is retained across deep sleep and
      * peripheral init / deinit cycles.
      */
+
     HAL_I2C_SetBusSpeed(RTE_APP_I2C_BUS_SPEED);
 
     /* Initialize 1ms timer for basic timing of application. */
@@ -259,6 +274,18 @@ void App_Env_Initialize(void)
 
     /* Initialize and put on-board sensors to sleep modes. */
     TRACE_PRINTF("Initializing sensors.\r\n");
+
+    // reset
+	analogOff();
+	HAL_Delay(500);
+
+	analogOn();
+	HAL_Delay(500);
+
+    /** init ADS7142 **/
+#if RTE_APP_ICS_EV_ENABLED == 1
+    CS_RegisterNode(CSN_LP_ADS7142_Create(Timer_GetContext()));
+#endif
 
     TRACE_PRINTF("Initializing sensors done.\r\n");
 }

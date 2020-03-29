@@ -45,130 +45,250 @@ static ret_t ads7142_set_bit(uint8_t dev_id, uint8_t addr, uint8_t value)
     return ADS7142_OK;
 }
 
-static void waitReady() {
-	while (DIO_DATA->ALIAS[PIN_READY] != 0);
-    //while (DIO->DATA[PIN_READY] == 1);
+static uint16_t ads7142_value_decode(uint8_t *data) {
+	return ((data[0] << 8) + data[1]) >> 4;
 }
 
-ret_t ads7142_reset() {
-	ret_t ret;
+static void ads7142_waitReady() {
+	// wait on the busy/ready pin
+	while (DIO_DATA->ALIAS[PIN_READY] != 0);
+}
 
-	waitReady();
-
-	uint8_t data[1];
-	data[0] = OP_DEVICE_RESET;
-	for (int i = 1; i < 127; ++i) {
-		if ((hal_error = HAL_I2C_Read(i, data, 1, true)) == HAL_OK) {
-			return i;
-		}
-	}
-
-    data[0] = OP_DEVICE_RESET;
-	if ((hal_error = HAL_I2C_Write(
-			ADS7142_I2C_ADDR, data, 1, false) != HAL_OK)) {
+static ret_t ads7142_device_reset() {
+	// send reset command
+    uint8_t data[] = { OP_DEVICE_RESET };
+	if ((hal_error = HAL_I2C_Write(ADS7142_I2C_ADDR, data, sizeof(data), false) != HAL_OK)) {
 		return ADS7142_COMM_ERROR;
 	}
 
-    data[0] = OP_GENERAL_CALL;
-    if ((hal_error = HAL_I2C_Write(
-    		ADS7142_I2C_ADDR, data, 1, false) != HAL_OK))
-    {
-        return ADS7142_COMM_ERROR;
-    }
-
-    data[0] = OP_DEVICE_RESET;
-    if ((hal_error = HAL_I2C_Write(
-    		ADS7142_I2C_ADDR, data, 1, false) != HAL_OK))
-    {
-        return ADS7142_COMM_ERROR;
-    }
-
-//	if ((ret = ads7142_write_reg(
-//			ADS7142_I2C_ADDR, REG_WKEY, VAL_WKEY_ENABLE_RESET)) != ADS7142_OK) {
-//		return ADS7142_COMM_ERROR;
-//	}
-//
-//	if ((ret = ads7142_set_bit(
-//			ADS7142_I2C_ADDR, REG_DEVICE_RESET, VAL_DEVICE_RESET)) != ADS7142_OK) {
-//		return ADS7142_COMM_ERROR;
-//	}
-
-	waitReady();
+	// wait for the ready signal
+	ads7142_waitReady();
 
 	return ADS7142_OK;
 }
 
-ret_t ads7142_check() {
-	uint8_t value;
+ret_t ads7142_init() {
+	// wait ready
+	ads7142_waitReady();
+
+	// reset
 	ret_t ret;
-//	if ((ret = ads7142_read_reg(ADS7142_I2C_ADDR, REG_WKEY, &value)) != ADS7142_OK) {
-//		return ret;
-//	}
+	if ((ret = ads7142_device_reset())) {
+		return ret;
+	}
+
+	// calibrate
+	if ((ret = ads7142_write_reg(ADS7142_I2C_ADDR, REG_OFFSET_CAL, 0x01))) {
+		return ret;
+	}
+
+	// input configure: 2 channel single-ended
+	if ((ret = ads7142_write_reg(ADS7142_I2C_ADDR, REG_CHANNEL_INPUT_CFG, 0x03))) {
+		return ret;
+	}
+
+	// op mode: auto seq enable
+	if ((ret = ads7142_write_reg(ADS7142_I2C_ADDR, REG_OPMODE_SEL, 0x04))) {
+		return ret;
+	}
+
+	if ((ret = ads7142_write_reg(ADS7142_I2C_ADDR,
+			REG_OSC_SEL, 0x01 /* = Device uses Low Power Oscillator */))) {
+		return ret;
+	}
+
+	if ((ret = ads7142_write_reg(ADS7142_I2C_ADDR,
+			REG_NCLK_SEL, 18 /* nCLK = 18 */))) {
+		return ret;
+	}
+
+	// auto seq channels: 0 & 1
+	if ((ret = ads7142_write_reg(ADS7142_I2C_ADDR, REG_AUTO_SEQ_CHEN, 0x03))) {
+		return ret;
+	}
+
+	ads7142_waitReady();
 
 	return ADS7142_OK;
+}
+
+ret_t ads7142_read(uint32_t channels[]) {
+	ret_t ret;
+	if ((ret = ads7142_write_reg(ADS7142_I2C_ADDR, REG_START_SEQUENCE, 0x01))) {
+		return ret;
+	}
+
+	uint8_t data[4];
+	if ((hal_error = HAL_I2C_Read(ADS7142_I2C_ADDR, data, sizeof(data), false)) != HAL_OK)
+	{
+		return ADS7142_COMM_ERROR;
+	}
+
+	channels[0] = ads7142_value_decode(data + 0);
+	channels[1] = ads7142_value_decode(data + 2);
+
+	if ((ret = ads7142_write_reg(ADS7142_I2C_ADDR, REG_ABORT_SEQUENCE, 0x01))) {
+		return ret;
+	}
+
+	ads7142_waitReady();
+
+	return ret;
+}
+
+ret_t ads7142_set_alert_thresholds(uint8_t channel, uint32_t low, uint32_t high) {
+	uint8_t lowLsb = low & 0xFF;
+	uint8_t lowMsb = low >> 8;
+	uint8_t highLsb = high & 0xFF;
+	uint8_t highMsb = high >> 8;
+
+	uint8_t regLowLsb;
+	uint8_t regLowMsb;
+	uint8_t regHighLsb;
+	uint8_t regHighMsb;
+
+	if (channel == 0) {
+		regLowLsb = DWC_LTH_CH0_LSB;
+		regLowMsb = DWC_LTH_CH0_MSB;
+		regHighLsb = DWC_HTH_CH0_LSB;
+		regHighMsb = DWC_HTH_CH0_MSB;
+
+	} else {
+		regLowLsb = DWC_LTH_CH1_LSB;
+		regLowMsb = DWC_LTH_CH1_MSB;
+		regHighLsb = DWC_HTH_CH1_LSB;
+		regHighMsb = DWC_HTH_CH1_MSB;
+	}
+
+	ret_t ret;
+	if ((ret = ads7142_write_reg(ADS7142_I2C_ADDR, regLowLsb, lowLsb))) {
+		return ret;
+	}
+
+	if ((ret = ads7142_write_reg(ADS7142_I2C_ADDR, regLowMsb, lowMsb))) {
+		return ret;
+	}
+
+	if ((ret = ads7142_write_reg(ADS7142_I2C_ADDR, regHighLsb, highLsb))) {
+		return ret;
+	}
+
+	if ((ret = ads7142_write_reg(ADS7142_I2C_ADDR, regHighMsb, highMsb))) {
+		return ret;
+	}
+
+	return ret;
+}
+
+ret_t ads7142_enable_alerts(bool channel0, bool channel1) {
+	uint8_t value = (channel0 ? 1 : 0) + (channel1 ? 2 : 0);
+
+	ret_t ret;
+
+	if ((ret = ads7142_write_reg(ADS7142_I2C_ADDR, ALERT_CHEN, value))) {
+		return ret;
+	}
+
+	if ((ret = ads7142_write_reg(ADS7142_I2C_ADDR, ALERT_DWC_EN, 0x01 /* enable window comparator */))) {
+		return ret;
+	}
+}
+
+ret_t ads7142_autonomous_mode_configure() {
+	ret_t ret;
+
+	if ((ret = ads7142_write_reg(ADS7142_I2C_ADDR,
+			REG_OPMODE_SEL, 0x06 /* = Autonomous Monitoring Mode */))) {
+		return ret;
+	}
+
+	if ((ret = ads7142_write_reg(ADS7142_I2C_ADDR,
+			REG_OSC_SEL, 0x01 /* = Device uses Low Power Oscillator */))) {
+		return ret;
+	}
+
+	if ((ret = ads7142_write_reg(ADS7142_I2C_ADDR,
+			REG_NCLK_SEL, 18 /* nCLK = 18 */))) {
+		return ret;
+	}
+
+	if ((ret = ads7142_write_reg(ADS7142_I2C_ADDR,
+			REG_DATA_BUFFER_OPMODE, 0x04 /* = Pre Alert Data Mode */))) {
+		return ret;
+	}
+
+	if ((ret = ads7142_write_reg(ADS7142_I2C_ADDR,
+			PRE_ALERT_MAX_EVENT_COUNT, 0x30 /* = 4 (3+1) */))) {
+		return ret;
+	}
+
+	return ret;
+
+}
+
+ret_t ads7142_autonomous_mode_start() {
+	ret_t ret;
+	if ((ret = ads7142_write_reg(ADS7142_I2C_ADDR, REG_START_SEQUENCE, 0x01))) {
+		return ret;
+	}
+
+	uint8_t data[2];
+	if ((hal_error = HAL_I2C_Read(ADS7142_I2C_ADDR, data, sizeof(data), false)) != HAL_OK)
+	{
+		return ADS7142_COMM_ERROR;
+	}
+
+
+	uint8_t highFlags;
+	uint8_t lowFlags;
+	if ((ret = ads7142_read_reg(ADS7142_I2C_ADDR, ALERT_LOW_FLAGS, &lowFlags))) {
+		return ret;
+	}
+
+	if ((ret = ads7142_read_reg(ADS7142_I2C_ADDR, ALERT_HIGH_FLAGS, &highFlags))) {
+		return ret;
+	}
+
+	if ((ret = ads7142_write_reg(ADS7142_I2C_ADDR, ALERT_LOW_FLAGS, 0x03 /* reset */))) {
+		return ret;
+	}
+
+	if ((ret = ads7142_write_reg(ADS7142_I2C_ADDR, ALERT_HIGH_FLAGS, 0x03 /* reset */))) {
+		return ret;
+	}
+
+	// wait for PIN_ADS7142_ALERT to get low
+    while (DIO_DATA->ALIAS[PIN_ADS7142_ALERT] == 0);
+
+	return ret;
+}
+
+ret_t ads7142_read_flags() {
+	uint8_t ret;
+	uint8_t highFlags;
+	uint8_t lowFlags;
+	if ((ret = ads7142_read_reg(ADS7142_I2C_ADDR, ALERT_LOW_FLAGS, &lowFlags))) {
+		return ret;
+	}
+
+	if ((ret = ads7142_read_reg(ADS7142_I2C_ADDR, ALERT_HIGH_FLAGS, &highFlags))) {
+		return ret;
+	}
+
+	uint8_t data[48];
+	if ((hal_error = HAL_I2C_Read(ADS7142_I2C_ADDR, data, sizeof(data), false)) != HAL_OK)
+	{
+		return ADS7142_COMM_ERROR;
+	}
+
+	uint16_t values[24];
+	for (int i = 0; i < 48; i += 2) {
+		values[i / 2] = ads7142_value_decode(data + i);
+	}
+
+	return ret;
 }
 
 int32_t ads7142_get_hal_error() {
 	return hal_error;
-}
-
-static ret_t ads7142_reg_write(uint8_t reg, uint8_t val)
-{
-
-  int ret = 0;
-//  uint8_t n = 0;    // counter to make several readings.
-//  i2c_cmd_handle_t cmd = i2c_cmd_link_create();
-//  printf("w reg ADS7142\n");
-//
-//
-//  cmd = i2c_cmd_link_create();
-//  i2c_master_start(cmd);
-//  i2c_master_write_byte(cmd, ADS7142_I2C_ADDR << 1 | WRITE_BIT, ACK_CHECK_EN); // read slave address
-//  i2c_master_write_byte(cmd, SINGLE_WRITE, ACK_CHECK_EN); // read slave address
-//  i2c_master_write_byte(cmd, reg, ACK_CHECK_EN);                            // slave register
-//  i2c_master_write_byte(cmd, val, ACK_CHECK_EN);                                  // slave register
-//  i2c_master_stop(cmd);
-//  ret = i2c_master_cmd_begin(I2C_PORT_A, cmd, 1000 / portTICK_RATE_MS);
-//
-//
-//  i2c_cmd_link_delete(cmd);
-
-
-  return(ret);
-
-}
-static ret_t ads7142_reg_read(uint8_t reg){
-  int ret = 0;
-//  uint8_t val = 0;
-//  static uint32_t count = 0;
-//  i2c_cmd_handle_t cmd = i2c_cmd_link_create();
-//  // INITIALIZATION OF THE DEVICE PART 1//
-//  printf("r reg ADS7142\n");
-//
-//  gpio_set_level(SQUARE_SIGNAL_PIN, 1); // TO MEASURE TASK TIME //
-//
-//  cmd = i2c_cmd_link_create();
-//  i2c_master_start(cmd);
-//
-//  i2c_master_write_byte(cmd, ADS7142_I2C_ADDR << 1 | WRITE_BIT, ACK_CHECK_EN);      // read slave address
-//  i2c_master_write_byte(cmd, reg, ACK_CHECK_EN);                                    // slave register
-//  i2c_master_write_byte(cmd, SINGLE_READ, ACK_CHECK_EN);                            // slave register
-//
-//  i2c_master_start(cmd);
-//  i2c_master_write_byte(cmd, ADS7142_I2C_ADDR << 1 | READ_BIT, ACK_CHECK_EN);       // read slave address
-//  i2c_master_read_byte(cmd, &val, ACK_CHECK_EN);                                    // slave register
-//
-//  i2c_master_stop(cmd);
-//
-//  ret = i2c_master_cmd_begin(I2C_PORT_A, cmd, 1000 / portTICK_RATE_MS);
-//  //vTaskDelay(10);   // this should give the control to another task while the i2c thingie is executed
-//  i2c_cmd_link_delete(cmd);
-//
-//  gpio_set_level(SQUARE_SIGNAL_PIN, 0); // TO MEASURE TASK TIME //
-//
-//  printf("%d\n",count);    // i2c crashing--> always ath the same place?
-//  count += 1;
-
-  return(ret);
-
 }

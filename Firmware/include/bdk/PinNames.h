@@ -73,7 +73,7 @@ typedef enum {
 	PIN_BUTTON1 = NC, /**< On-board user button PB2 (Board center). */
 
     PIN_LED_RED = PIN_DIO5,
-	PIN_LED_GREEN = PIN_DIO8, /* Analog power enable */
+	PIN_ANALOG_POWER = PIN_DIO8, /* Analog power enable */
 	PIN_LED_BLUE = NC,
 
 	PIN_GIO_SPARE = NC, /**< GPIO pin for expansion header. */

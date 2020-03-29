@@ -21,6 +21,8 @@ void App_PeerDeviceConnected(void)
     TRACE_PRINTF("PEER DEVICE CONNECTED\r\n");
 
     app_state = APP_STATE_CONNECTED;
+
+    ledNotif(1);
 }
 
 void App_PeerDeviceDisconnected(void)
@@ -30,4 +32,6 @@ void App_PeerDeviceDisconnected(void)
     CS_SetPowerMode(CS_POWER_MODE_SLEEP);
 
     app_state = APP_STATE_START_ADVERTISING;
+
+    ledNotif(3);
 }

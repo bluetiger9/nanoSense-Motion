@@ -102,6 +102,9 @@ extern void BLE_Initialize(void);
 
 extern void App_Env_Initialize(void);
 
+void ledNotif(uint8_t cnt);
+
+void ledNotif2(uint8_t cnt, uint8_t period);
 
 #ifdef __cplusplus
 }

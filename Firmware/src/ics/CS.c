@@ -122,6 +122,8 @@ int CS_RegisterNode(struct CS_Node_Struct* node)
 
 int CS_ProcessRequest(char *request)
 {
+	ledNotif2(3, 200);
+
 	int errcode, i;
 	uint32_t timestamp;
 	struct CS_Request_Struct parsed_request;
@@ -364,6 +366,7 @@ void CS_Log(enum CS_Log_Level level, const char* module, const char* fmt, ...)
 
 static int CSN_SYS_RequestHandler(const struct CS_Request_Struct* request, char* response)
 {
+	ledNotif2(2, 200);
 	// CONF property request (RW)
 	if (strcmp(request->property, "CONF") == 0)
 	{

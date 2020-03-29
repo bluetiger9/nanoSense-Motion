@@ -38,7 +38,7 @@
 // <o> Advertising Stop Timeout [s] <1-1000>
 // <i> Default: 60 s
 #ifndef RTE_APP_ADV_DISABLE_TIMEOUT
-#define RTE_APP_ADV_DISABLE_TIMEOUT  1000
+#define RTE_APP_ADV_DISABLE_TIMEOUT  10
 #endif
 
 // <o> Wake-up Button Check Interval [ms] <10-1000000>

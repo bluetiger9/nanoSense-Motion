@@ -27,13 +27,11 @@
 /** LED names accepted by LED API when HB-GEVB board is used. */
 typedef enum {
     LED0 = PIN_LED_RED,
-	LED1 = PIN_LED_GREEN,
-	LED2 = PIN_LED_BLUE,
+	//LED1 = PIN_ANALOG_POWER,
 
     /* Aliases. */
 	LED_RED = LED0,
-    LED_GREEN = LED1,
-	LED_BLUE = LED2,
+    ANALOG_POWER = PIN_ANALOG_POWER,
 
     LED_FAILURE = LED0 /**< LED to use by HAL_Failure function when assertion fails. Alias to \ref LED0 */
 } LedName;

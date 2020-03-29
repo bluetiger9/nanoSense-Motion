@@ -66,10 +66,11 @@ void Sleep_Mode_Configure(struct sleep_mode_env_tag *sleep_env)
      *    WAKEUP_WAKEUP_PAD_[RISING | FALLING],
      *    WAKEUP_DIO*_[RISING | FALLING],
      *    WAKEUP_DIO*_[ENABLE | DISABLE] */
-    sleep_mode_init_env.wakeup_cfg = WAKEUP_DELAY_64          |
+    sleep_mode_init_env.wakeup_cfg = // WAKEUP_DELAY_64       |
                                      WAKEUP_WAKEUP_PAD_RISING |
                                      WAKEUP_DIO3_DISABLE      |
-                                     WAKEUP_DIO2_DISABLE      |
+									 WAKEUP_DIO2_ENABLE  	  |
+									 WAKEUP_DIO2_RISING       |
                                      WAKEUP_DIO1_DISABLE      |
                                      WAKEUP_DIO0_DISABLE;
 
@@ -85,7 +86,7 @@ void Sleep_Mode_Configure(struct sleep_mode_env_tag *sleep_env)
      *    WAKEUP_DIO2_EVENT_CLEAR,
      *    WAKEUP_DIO1_EVENT_CLEAR],
      *    WAKEUP_DIO0_EVENT_CLEAR */
-    sleep_env->wakeup_ctrl = PADS_RETENTION_ENABLE         |
+    sleep_env->wakeup_ctrl = PADS_RETENTION_ENABLE              |
                                   BOOT_FLASH_APP_REBOOT_DISABLE |
                                   BOOT_CUSTOM                   |
                                   WAKEUP_DCDC_OVERLOAD_CLEAR    |

@@ -98,6 +98,9 @@ void HAL_I2C_Init(void)
 	retval = Driver_I2C0.PowerControl(ARM_POWER_FULL);
 	ASSERT_DEBUG(retval == ARM_DRIVER_OK);
 
+	retval = Driver_I2C0.Control(ARM_I2C_BUS_CLEAR, 0);
+	ASSERT_DEBUG(retval == ARM_DRIVER_OK);
+
 	retval = Driver_I2C0.Control(ARM_I2C_BUS_SPEED, ctrl.bus_speed);
 	ASSERT_DEBUG(retval == ARM_DRIVER_OK);
 

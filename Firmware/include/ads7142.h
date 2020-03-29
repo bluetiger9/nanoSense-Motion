@@ -2,6 +2,7 @@
 #define INCLUDE_ADS7142_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #define ADS7142_OK 				  0
 #define ADS7142_COMM_ERROR		  1
@@ -27,20 +28,20 @@
 #define REG_OFFSET_CAL            0x15
 #define REG_OPMODE_SEL            0x1C
 
-#define OPMODE_I2CMODE_STATUS     0x00
-#define CHANNEL_INPUT_CFG         0x24
-#define AUTO_SEQ_CHEN             0x20
-#define START_SEQUENCE            0x1E
+#define REG_OPMODE_I2CMODE_STATUS     0x00
+#define REG_CHANNEL_INPUT_CFG         0x24
+#define REG_AUTO_SEQ_CHEN             0x20
+#define REG_START_SEQUENCE            0x1E
 
-#define ABORT_SEQUENCE            0x1F
-#define SEQUENCE_STATUS           0x04
-#define OSC_SEL                   0x18
-#define NCLK_SEL                  0x19
+#define REG_ABORT_SEQUENCE            0x1F
+#define REG_SEQUENCE_STATUS           0x04
+#define REG_OSC_SEL                   0x18
+#define REG_NCLK_SEL                  0x19
 
-#define DATA_BUFFER_OPMODE        0x2C
-#define DOUT_FORMAT_CFG           0x28
-#define DATA_BUFFER_STATUS        0x01
-#define ACC_EN                    0x30
+#define REG_DATA_BUFFER_OPMODE        0x2C
+#define REG_DOUT_FORMAT_CFG           0x28
+#define REG_DATA_BUFFER_STATUS        0x01
+#define REG_ACC_EN                    0x30
 
 
 #define ACC_CH0_LSB               0x08
@@ -81,7 +82,17 @@
 
 typedef int32_t ret_t;
 
-ret_t ads7142_reset();
+ret_t ads7142_init();
+
+ret_t ads7142_read(uint32_t channels[]);
+
+ret_t ads7142_set_alert_thresholds(uint8_t channel, uint32_t low, uint32_t high);
+
+ret_t ads7142_enable_alerts(bool channel0, bool channel1);
+
+ret_t ads7142_autonomous_mode_configure();
+
+ret_t ads7142_autonomous_mode_start();
 
 ret_t ads7142_check();
 
